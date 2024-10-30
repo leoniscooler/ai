@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f9;
+    }
+    .chat-container {
+      width: 350px;
+      background: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .chat-window {
+      max-height: 400px;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    .message {
+      padding: 8px 10px;
+      margin: 8px;
+      border-radius: 4px;
+    }
+    .bot-message {
+      background: #e0e0e0;
+      align-self: flex-start;
+    }
+    .user-message {
+      background: #0084ff;
+      color: white;
+      align-self: flex-end;
+    }
+    .input-container {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+    .input-box {
+      flex: 1;
+      padding: 10px;
+      border: none;
+    }
+    .send-btn {
+      background: #0084ff;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .send-btn:hover {
+      background: #006bbf;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chat-container">
+    <div id="chatWindow" class="chat-window"></div>
+    <div class="input-container">
+      <input id="userInput" type="text" class="input-box" placeholder="Type your message...">
+      <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chatWindow = document.getElementById("chatWindow");
+    const userInput = document.getElementById("userInput");
+
+    // Chatbot responses with context and randomness
+    const botMemory = { previousResponse: "" };
+    
+    const responses = [
+      { pattern: /hello|hi|hey/i, responses: ["Hello! How can I help you today?", "Hi there! What's on your mind?", "Hey! Need any assistance?"] },
+      { pattern: /how are you/i, responses: ["I'm here and ready to help!", "I'm just a bot, but thanks for asking!", "Doing well! How about you?"] },
+      { pattern: /what is your name/i, responses: ["I'm your friendly chatbot!", "Just call me your helpful assistant!", "I don't have a name, but I'm here to help!"] },
+      { pattern: /what can you do/i, responses: ["I can answer questions, have conversations, and help you with information!", "Try asking me something specific, and I'll do my best to help!"] },
+      { pattern: /tell me a joke/i, responses: ["Why did the programmer quit? Because he didn’t get arrays!", "Why do programmers prefer dark mode? Because light attracts bugs!"] },
+      { pattern: /bye|goodbye/i, responses: ["Goodbye! Feel free to return anytime!", "Take care! Looking forward to our next chat!", "See you later!"] },
+      { pattern: /.*/, responses: ["I'm not sure I understand. Could you rephrase?", "That's interesting! Tell me more.", "Could you clarify that for me?", "Hmm, I'm not sure about that. Maybe ask in a different way?"] }
+    ];
+
+    function sendMessage() {
+      const message = userInput.value.trim();
+      if (message) {
+        displayMessage(message, "user");
+        generateResponse(message.toLowerCase());
+        userInput.value = "";
+      }
+    }
+
+    function displayMessage(text, sender) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}-message`;
+      messageDiv.innerText = text;
+      chatWindow.appendChild(messageDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function generateResponse(userMessage) {
+      let response = getDynamicResponse(userMessage);
+      botMemory.previousResponse = response;
+      setTimeout(() => displayMessage(response, "bot"), 500); 
+    }
+
+    function getDynamicResponse(userMessage) {
+      for (let { pattern, responses: resOptions } of responses) {
+        if (userMessage.match(pattern)) {
+          // Avoid repetitive responses by checking previous response
+          let filteredResponses = resOptions.filter(res => res !== botMemory.previousResponse);
+          return filteredResponses.length ? randomChoice(filteredResponses) : randomChoice(resOptions);
+        }
+      }
+    }
+
+    function randomChoice(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+  </script>
+
+</body>
+</html>
